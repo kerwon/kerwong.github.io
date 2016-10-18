@@ -1,0 +1,856 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Apache," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Nutslog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="本日志主要记录Apache 在Ubuntu 下的安装
+方法一：Apt安装apt-get1sudo apt-get install apache2
+完成后，通过修改1/etc/apache2/apache2.conf
+来完成配置
+方法二：使用Apache源代码编译安装下载Apache 的源代码从Apache 官网或其他可用源处下载Apache 的源代码
+
+http://httpd.apache.or">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简介Ubuntu下Apache服务器的安装">
+<meta property="og:url" content="http://www.wenchao.wang/2015/10/简介Ubuntu下Apache服务器的安装/index.html">
+<meta property="og:site_name" content="Nutslog">
+<meta property="og:description" content="本日志主要记录Apache 在Ubuntu 下的安装
+方法一：Apt安装apt-get1sudo apt-get install apache2
+完成后，通过修改1/etc/apache2/apache2.conf
+来完成配置
+方法二：使用Apache源代码编译安装下载Apache 的源代码从Apache 官网或其他可用源处下载Apache 的源代码
+
+http://httpd.apache.or">
+<meta property="og:updated_time" content="2016-10-18T07:05:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简介Ubuntu下Apache服务器的安装">
+<meta name="twitter:description" content="本日志主要记录Apache 在Ubuntu 下的安装
+方法一：Apt安装apt-get1sudo apt-get install apache2
+完成后，通过修改1/etc/apache2/apache2.conf
+来完成配置
+方法二：使用Apache源代码编译安装下载Apache 的源代码从Apache 官网或其他可用源处下载Apache 的源代码
+
+http://httpd.apache.or">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '7850296',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.wenchao.wang/2015/10/简介Ubuntu下Apache服务器的安装/"/>
+
+
+  <title> 简介Ubuntu下Apache服务器的安装 | Nutslog </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?853529895bee96b6d4b73302b1450327";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Nutslog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Intergation, I believe that practice, not dogma</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                简介Ubuntu下Apache服务器的安装
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2015-10-16T21:35:17+08:00" content="2015-10-16">
+              2015-10-16
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2015/10/简介Ubuntu下Apache服务器的安装/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/简介Ubuntu下Apache服务器的安装/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2015/10/简介Ubuntu下Apache服务器的安装/" class="leancloud_visitors" data-flag-title="简介Ubuntu下Apache服务器的安装">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本日志主要记录Apache 在Ubuntu 下的安装</p>
+<h2 id="方法一：Apt安装"><a href="#方法一：Apt安装" class="headerlink" title="方法一：Apt安装"></a>方法一：Apt安装</h2><p>apt-get<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install apache2</div></pre></td></tr></table></figure></p>
+<p>完成后，通过修改<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/etc/apache2/apache2.conf</div></pre></td></tr></table></figure></p>
+<p>来完成配置</p>
+<h2 id="方法二：使用Apache源代码编译安装"><a href="#方法二：使用Apache源代码编译安装" class="headerlink" title="方法二：使用Apache源代码编译安装"></a>方法二：使用Apache源代码编译安装</h2><h3 id="下载Apache-的源代码"><a href="#下载Apache-的源代码" class="headerlink" title="下载Apache 的源代码"></a>下载Apache 的源代码</h3><p>从Apache 官网或其他可用源处下载Apache 的源代码</p>
+<blockquote>
+<p><a href="http://httpd.apache.org/download.cgi" target="_blank" rel="external">http://httpd.apache.org/download.cgi</a><br><a href="http://apache.etoak.com//httpd/httpd-2.4.3.tar.gz" target="_blank" rel="external">http://apache.etoak.com//httpd/httpd-2.4.3.tar.gz</a></p>
+</blockquote>
+<p>此链接为Apache 项目的官网，可获得Apache 服务器的多种版本，包括稳定版和 Beta 版等。此次选择下载了<code>httpd-2.4.3.tar.gz</code> 文件。</p>
+<h3 id="解压文件"><a href="#解压文件" class="headerlink" title="解压文件"></a>解压文件</h3><p>下载完毕后得到<code>httpd-2.4.3.tar.gz</code> 文件，下一步需要对其进行解压。Linux 解压命令功能较为强大，可以直接选择解压至安装路径也可以先解压至指定路径，之后再复制到安装路径。<br>直接安装, 输入命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo tar zxvf httpd-2.4.3.tar.gz -C /usr/local/    //将Apache源文件解压至/usr/local/目录下</div></pre></td></tr></table></figure></p>
+<p>Tar为归档文件压缩和解压指令</p>
+<blockquote>
+<p>-z 是配合解压.GZ的<br>-x 解开一个包文件<br>-v 显示详细信息<br>-f 必须，表示使用归档文件</p>
+</blockquote>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">…</div><div class="line">httpd-2.4.3/docs/manual/howto/htaccess.html.ja.utf8</div><div class="line">httpd-2.4.3/docs/manual/howto/htaccess.html.ko.euc-kr</div><div class="line">httpd-2.4.3/docs/manual/howto/htaccess.html.pt-br</div><div class="line">httpd-2.4.3/docs/manual/howto/index.html</div><div class="line">……</div><div class="line">httpd-2.4.3/docs/manual/howto/ssi.html.en</div><div class="line">httpd-2.4.3/docs/manual/howto/ssi.html.fr</div><div class="line">httpd-2.4.3/docs/manual/howto/ssi.html.ja.utf8</div><div class="line">httpd-2.4.3/docs/manual/howto/ssi.html.ko.euc-kr</div><div class="line">httpd-2.4.3/docs/manual/faq/index.html</div><div class="line">…</div></pre></td></tr></table></figure></p>
+<p>切换至<code>/usr/local/httpd-2.4.3</code> 目录下查看。<br>输入指令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">cd /usr/local/httpd-2.4.3</div><div class="line">ls</div></pre></td></tr></table></figure></p>
+<p>输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line">wang@Wang-Satellite-M300:/usr/local/httpd-2.4.3$ ls -l</div><div class="line">total 1568</div><div class="line">-rw-r--r-- 1 501 staff 13507 Mar 29 2011 ABOUT_APACHE</div><div class="line">-rw-r--r-- 1 501 staff 22850 Jul 23 23:20 acinclude.m4</div><div class="line">-rw-r--r-- 1 501 staff 63038 Jan 31 2012 Apache-apr2.dsw</div><div class="line">-rw-r--r-- 1 501 staff 77169 Nov 19 2011 Apache.dsw</div><div class="line">-rw-r--r-- 1 501 staff 9907 Dec 18 2009 apache_probes.d</div><div class="line">-rw-r--r-- 1 501 staff 2512 Dec 22 2008 ap.d</div><div class="line">drwxr-xr-x 6 501 staff 4096 Nov 22 20:56 build</div><div class="line">-rw-r--r-- 1 501 staff 2644 Aug 24 2007 BuildAll.dsp</div><div class="line">-rw-r--r-- 1 501 staff 2724 Nov 12 2011 BuildBin.dsp</div><div class="line">-rwxr-xr-x 1 501 staff 6791 Jan 17 2011 buildconf</div><div class="line">-rw-r--r-- 1 501 staff 118884 Aug 18 01:05 CHANGES</div><div class="line">-rw-r--r-- 1 501 staff 12567 Apr 17 2012 config.layout</div><div class="line">-rwxr-xr-x 1 501 staff 956655 Aug 18 01:20 configure</div><div class="line">-rw-r--r-- 1 501 staff 27680 Jul 23 23:20 configure.in</div><div class="line">drwxr-xr-x 9 501 staff 4096 Nov 22 20:56 docs</div><div class="line">-rw-r--r-- 1 501 staff 403 Nov 22 2004 emacs-style</div><div class="line">-rw-r--r-- 1 501 staff 4124 Jun 12 2008 httpd.dsp</div><div class="line">-rw-r--r-- 1 501 staff 17556 Aug 18 01:20 httpd.spec</div><div class="line">drwxr-xr-x 2 501 staff 4096 Nov 22 20:56 include</div><div class="line">-rw-r--r-- 1 501 staff 5083 Aug 16 20:42 INSTALL</div><div class="line">-rw-r--r-- 1 501 staff 2909 Nov 15 2011 InstallBin.dsp</div><div class="line">-rw-r--r-- 1 501 staff 4142 Dec 16 2010 LAYOUT</div><div class="line">-rw-r--r-- 1 501 staff 20486 Jan 31 2012 libhttpd.dsp</div><div class="line">-rw-r--r-- 1 501 staff 25852 Jul 24 2011 LICENSE</div><div class="line">-rw-r--r-- 1 501 staff 9532 Jan 23 2012 Makefile.in</div><div class="line">-rw-r--r-- 1 501 staff 46658 Apr 21 2012 Makefile.win</div><div class="line">drwxr-xr-x 26 501 staff 4096 Nov 22 20:56 modules</div><div class="line">-rw-r--r-- 1 501 staff 550 Jul 19 14:48 NOTICE</div><div class="line">-rw-r--r-- 1 501 staff 13681 Mar 16 2012 NWGNUmakefile</div><div class="line">drwxr-xr-x 7 501 staff 4096 Nov 22 20:56 os</div><div class="line">-rw-r--r-- 1 501 staff 5158 Feb 20 2012 README</div><div class="line">-rw-r--r-- 1 501 staff 5572 Apr 23 2010 README.platforms</div><div class="line">-rw-r--r-- 1 501 staff 10184 Oct 31 2010 ROADMAP</div><div class="line">drwxr-xr-x 3 501 staff 4096 Nov 22 20:56 server</div><div class="line">drwxr-xr-x 2 501 staff 4096 Nov 22 20:56 srclib</div><div class="line">drwxr-xr-x 4 501 staff 4096 Nov 22 20:56 support</div><div class="line">drwxr-xr-x 2 501 staff 4096 Nov 22 20:56 test</div><div class="line">-rw-r--r-- 1 501 staff 8183 Mar 1 2007 VERSIONING</div></pre></td></tr></table></figure></p>
+<p>在开始编译 Apache 源文件时需要配置一下，主要是设定编译好的文件的路径。<br>但是，在第一次配置中出现了错误，系统提示需要 <code>apr</code> 和 <code>apr-util</code> 两部分，因此，先配置安装这两个部分。</p>
+<h3 id="安装-apr-和-apr-util-并配置"><a href="#安装-apr-和-apr-util-并配置" class="headerlink" title="安装 apr 和 apr-util 并配置"></a>安装 apr 和 apr-util 并配置</h3><p><strong>从Apache 官网下载apr 和apr-util 两个文件</strong><br>以下为官网推荐的镜像下载地址， </p>
+<blockquote>
+<p>apr <a href="http://mirror.bjtu.edu.cn/apache//apr/apr-1.4.6.tar.gz" target="_blank" rel="external">下载地址</a><br>apr-util <a href="http://mirror.bjtu.edu.cn/apache//apr/apr-util-1.5.1.tar.gz" target="_blank" rel="external">下载地址</a></p>
+</blockquote>
+<p>输入指令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">sudo tar zxvf apr-1.4.6.tar.gz -C /usr/local/</div><div class="line">sudo tar zxvf apr-util-1.5.1.tar.gz -C /usr/local/</div></pre></td></tr></table></figure></p>
+<p><strong>配置 <code>apr</code> 和 <code>apr-util</code> 两个文件</strong><br>首先进入到 <code>apr</code> 解压后的目录下，用<code>cd</code>命令。<br>输入指令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./configure –prefix=/usr/local/apr    //意思是将编译后的apr文件的顶层路径设为/usr/local/apr</div></pre></td></tr></table></figure></p>
+<p>然后开始编译<code>apr</code>，编译过程同其他编译。<br>输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">make</div><div class="line">make install</div></pre></td></tr></table></figure></p>
+<p>然后是<code>apr-util</code>的配置和编译。<br><code>apr-util</code> 的配置和 <code>apr</code> 配置大同小异，但由于其对 <code>apr</code> 有依赖，因此需要比 <code>apr</code> 多了一项配置要求。<br>首先进入 <code>apr-util</code> 解压至的目录下<br>输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./configure --prefix=/usr/local/apr-util --with-apr=/usr/local/apr-1.4.6 &gt; ~/apr-util.txt</div></pre></td></tr></table></figure></p>
+<p>然后开始编译<br>输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">make</div><div class="line">make install</div></pre></td></tr></table></figure></p>
+<p><em>注意：有时有的系统还需要 <code>pcre</code>，<a href="http://pcre.org/" target="_blank" rel="external">下载地址</a></em><br>下载后的编译和安装都差不多，不再赘述。这里我直接用 <code>apt</code> 安装了 <code>pcre</code><br>输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo apt-get install libpcre3-dev</div></pre></td></tr></table></figure></p>
+<h3 id="配置apache"><a href="#配置apache" class="headerlink" title="配置apache"></a>配置apache</h3><p>进入到解压后的 <code>httpd-2.4.3</code> 目录下。配置<br>输入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo ./configure --prefix=/usr/local/apache2 --with-apr=/usr/local/apr-1.4.6 --with-apr-util=/usr/local/apr-util-1.5.1 --enable-so &gt; ~/apache2.txt</div></pre></td></tr></table></figure></p>
+<p>这里是最基本的 Apache 配置，除此之外还可以配置模块和其他细节。Apache 在该配置下默认为最小安装。更多 configure ，可以参考 <a href="http://apache.jz123.cn/programs/configure.html" target="_blank" rel="external">http://apache.jz123.cn/programs/configure.html</a><br>然后是 <code>make</code> 和 <code>make install</code>。安装完毕。<br>进入到 bin 目录，执行<code>./apachectl start</code>，如果一切安装顺利，可以看到：<strong>It works</strong>。<br>对于原来的<code>apr-1.4.6</code>，<code>apr-util-1.5.1</code> 和<code>httpd-xx</code> 等文件夹可以视需要来决定是否删去。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持书写高质量博客，感谢您的支持！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay_reward.jpg" alt="Alex Wang Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Apache/" rel="tag">#Apache</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/Spring-与-MyBatis-的集成详解/" rel="prev" title="Spring 与 MyBatis 的集成详解">
+                Spring 与 MyBatis 的集成详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2015/10/简介Ubuntu下Apache服务器的安装/"
+           data-title="简介Ubuntu下Apache服务器的安装" data-url="http://www.wenchao.wang/2015/10/简介Ubuntu下Apache服务器的安装/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/author.jpg"
+               alt="Alex Wang" />
+          <p class="site-author-name" itemprop="name">Alex Wang</p>
+          <p class="site-description motion-element" itemprop="description">印多为忌，不见食伤，始勤终惰，多学少成</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.wenchao.wang/" title="我的个人域名站" target="_blank">我的个人域名站</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法一：Apt安装"><span class="nav-number">1.</span> <span class="nav-text">方法一：Apt安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法二：使用Apache源代码编译安装"><span class="nav-number">2.</span> <span class="nav-text">方法二：使用Apache源代码编译安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#下载Apache-的源代码"><span class="nav-number">2.1.</span> <span class="nav-text">下载Apache 的源代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解压文件"><span class="nav-number">2.2.</span> <span class="nav-text">解压文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-apr-和-apr-util-并配置"><span class="nav-number">2.3.</span> <span class="nav-text">安装 apr 和 apr-util 并配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置apache"><span class="nav-number">2.4.</span> <span class="nav-text">配置apache</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alex Wang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"wangwc"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("1hFN1RT1TWl9udv3DzBSLoOO-gzGzoHsz", "KdmVKSRnWv14ngT2VYDNuS08");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Python,Test," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Nutslog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="在运行程序时，为了监控程序的行为需要对程序行为记录日志。
+在Python 下，就有这样一个专门用来做日志记录的类库，logging
+简单的将日志打印到屏幕12345678910111213141516#!/usr/bin/env python# -*- coding: utf8 -*-# -- modules --import logging# -- start --if __name__ ==">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python logging日志模块使用小结">
+<meta property="og:url" content="http://www.wenchao.wang/2016/10/Python-logging日志模块使用小结/index.html">
+<meta property="og:site_name" content="Nutslog">
+<meta property="og:description" content="在运行程序时，为了监控程序的行为需要对程序行为记录日志。
+在Python 下，就有这样一个专门用来做日志记录的类库，logging
+简单的将日志打印到屏幕12345678910111213141516#!/usr/bin/env python# -*- coding: utf8 -*-# -- modules --import logging# -- start --if __name__ ==">
+<meta property="og:updated_time" content="2016-10-18T07:35:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python logging日志模块使用小结">
+<meta name="twitter:description" content="在运行程序时，为了监控程序的行为需要对程序行为记录日志。
+在Python 下，就有这样一个专门用来做日志记录的类库，logging
+简单的将日志打印到屏幕12345678910111213141516#!/usr/bin/env python# -*- coding: utf8 -*-# -- modules --import logging# -- start --if __name__ ==">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"always"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '7850296',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://www.wenchao.wang/2016/10/Python-logging日志模块使用小结/"/>
+
+
+  <title> Python logging日志模块使用小结 | Nutslog </title>
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?853529895bee96b6d4b73302b1450327";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Nutslog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Intergation, I believe that practice, not dogma</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Python logging日志模块使用小结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-18T15:28:21+08:00" content="2016-10-18">
+              2016-10-18
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/10/Python-logging日志模块使用小结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/Python-logging日志模块使用小结/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2016/10/Python-logging日志模块使用小结/" class="leancloud_visitors" data-flag-title="Python logging日志模块使用小结">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在运行程序时，为了监控程序的行为需要对程序行为记录日志。</p>
+<p>在Python 下，就有这样一个专门用来做日志记录的类库，logging</p>
+<h2 id="简单的将日志打印到屏幕"><a href="#简单的将日志打印到屏幕" class="headerlink" title="简单的将日志打印到屏幕"></a>简单的将日志打印到屏幕</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="comment"># -*- coding: utf8 -*-</span></div><div class="line"></div><div class="line"><span class="comment"># -- modules --</span></div><div class="line"><span class="keyword">import</span> logging</div><div class="line"></div><div class="line"><span class="comment"># -- start --</span></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    <span class="comment"># 默认情况下，logging将日志打印到屏幕，日志级别为WARNING</span></div><div class="line"></div><div class="line">    <span class="comment"># 日志级别大小关系为：CRITICAL &gt; ERROR</span></div><div class="line">    <span class="comment"># &gt; WARNING &gt; INFO &gt; DEBUG &gt; NOTSET</span></div><div class="line"></div><div class="line">    logging.debug(<span class="string">'DEBUG'</span>) <span class="comment"># 屏幕不显示</span></div><div class="line">    logging.info(<span class="string">'INFO'</span>) <span class="comment"># 屏幕不显示</span></div><div class="line">    logging.warning(<span class="string">'WARNING'</span>)</div></pre></td></tr></table></figure>
+<p>屏幕输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">wang@Wang:~/Workspace/Python/Template/logger$ ./logger1.py</div><div class="line">WARNING:root:WARNING</div><div class="line">通过logging.basicConfig 函数对日志的输出格式及方式做相关配置</div><div class="line">#!/usr/bin/env python</div><div class="line"># -*- coding: utf8 -*-</div><div class="line"></div><div class="line"># -- modules --</div><div class="line">import logging</div><div class="line"></div><div class="line"># -- start --</div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    logging.basicConfig(level=logging.DEBUG,</div><div class="line">    format=&apos;[%(asctime)s] %(filename)s [line:%(lineno)d] [%(levelname)s] %(message)s&apos;,</div><div class="line">            datefmt=&apos;%a, %d %b %Y %H:%M:%S&apos;,</div><div class="line">            filename=&apos;test.log&apos;,</div><div class="line">            filemode=&apos;w&apos;)</div><div class="line">    logging.exception(&apos;This is EXCEPTION&apos;)</div><div class="line">    try:</div><div class="line">        1/0</div><div class="line">    except Exception, e:</div><div class="line">        logging.exception(&apos;This is EXCEPTION [%s]&apos; % e)</div><div class="line">        logging.critical(&apos;This is CRITICAL&apos;)</div><div class="line">        logging.error(&apos;This is ERROR&apos;)</div><div class="line">        logging.warning(&apos;This is WARNING&apos;)</div><div class="line">        logging.info(&apos;This is INFO&apos;)</div><div class="line">        logging.debug(&apos;This is DEBUG&apos;)</div></pre></td></tr></table></figure></p>
+<p>配置完成后，日志输出至test.log 日志文件</p>
+<p><strong>注意：由于日志写入模式设置为’w ‘，因此重复运行时会将之前的日志清空。</strong></p>
+<p>logging.basicConfig 函数各参数:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">filename: 指定日志文件名</div><div class="line">filemode: 和file函数意义相同，指定日志文件的打开模式，’w’或’a’</div><div class="line">format: 指定输出的格式和内容，format可以输出很多有用信息，如上例所示:</div><div class="line">%(levelno)s: 打印日志级别的数值</div><div class="line">%(levelname)s: 打印日志级别名称</div><div class="line">%(pathname)s: 打印当前执行程序的路径，其实就是sys.argv[0]</div><div class="line">%(filename)s: 打印当前执行程序名</div><div class="line">%(funcName)s: 打印日志的当前函数</div><div class="line">%(lineno)d: 打印日志的当前行号</div><div class="line">%(asctime)s: 打印日志的时间</div><div class="line">%(thread)d: 打印线程ID</div><div class="line">%(threadName)s: 打印线程名称</div><div class="line">%(process)d: 打印进程ID</div><div class="line">%(message)s: 打印日志信息</div><div class="line">datefmt: 指定时间格式，同time.strftime()</div><div class="line">level: 设置日志级别，默认为logging.WARNING</div><div class="line">stream: 指定将日志的输出流，可以指定输出到sys.stderr,</div><div class="line">sys.stdout或者文件，默认输出到sys.stderr，当stream和filename同时指定时，stream被忽略</div></pre></td></tr></table></figure></p>
+<p>日志输出内容如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:14] [ERROR] This is EXCEPTION</div><div class="line">None</div><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:18] [ERROR] This is EXCEPTION [integer division or modulo by zero]</div><div class="line">Traceback (most recent call last):</div><div class="line">File &quot;./logger2.py&quot;, line 16, in &lt;module&gt;</div><div class="line">1/0</div><div class="line">ZeroDivisionError: integer division or modulo by zero</div><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:19] [CRITICAL] This is CRITICAL</div><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:20] [ERROR] This is ERROR</div><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:21] [WARNING] This is WARNING</div><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:22] [INFO] This is INFO</div><div class="line">[Mon, 15 Apr 2013 22:37:28] logger2.py [line:23] [DEBUG] This is DEBUG</div></pre></td></tr></table></figure></p>
+<p>特别指出EXCEPTION</p>
+<p>在日志中输出为ERROR ，但是会多输出一行错误信息，如果没有设置，则输出None 。如日志第一条</p>
+<p>EXCEPTION 的正确用法是嵌套在except:  中，并用以输出错误信息。</p>
+<p>要指出的是，错误信息会为EXCEPTION 保持，即使在logging.debug() 后logging.exception(‘X’)</p>
+<p>那么仍会输出原来未改变的错误信息，即输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[Mon, 15 Apr 2013 xx:xx:xx] logger2.py [line:18] [ERROR] X [integer division or modulo by zero]</div><div class="line">Traceback (most recent call last):</div><div class="line">File &quot;./logger2.py&quot;, line 16, in &lt;module&gt;</div><div class="line">1/0</div></pre></td></tr></table></figure></p>
+<p>将日志同时输出到文件和屏幕<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#!/usr/bin/env python</span></div><div class="line"><span class="comment"># -*- coding: utf8 -*-</span></div><div class="line"></div><div class="line"><span class="comment"># -- modules --</span></div><div class="line"><span class="keyword">import</span> logging</div><div class="line"></div><div class="line"><span class="comment"># -- start --</span></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    logging.basicConfig(level=logging.DEBUG,</div><div class="line">    format=<span class="string">'%(asctime)s %(filename)s [line:%(lineno)d] %(levelname)s %(message)s'</span>,</div><div class="line">            datefmt=<span class="string">'%a, %d %b %Y %H:%M:%S'</span>,</div><div class="line">            filename=<span class="string">'test.log'</span>,</div><div class="line">            filemode=<span class="string">'w'</span>)</div><div class="line"></div><div class="line">    console = logging.StreamHandler()</div><div class="line">    console.setLevel(logging.WARNING)</div><div class="line">    formatter=logging.Formatter(<span class="string">'%(name)-12s: %(levelname)-8s %(message)s'</span>)</div><div class="line">    console.setFormatter(formatter)</div><div class="line">    logging.getLogger(<span class="string">''</span>).addHandler(console)</div><div class="line"></div><div class="line">    logging.debug(<span class="string">'This is DEBUG'</span>)</div><div class="line">    logging.info(<span class="string">'This is INFO'</span>)</div><div class="line">    logging.warning(<span class="string">'This is WARNING'</span>)</div></pre></td></tr></table></figure></p>
+<p>注意：basicConfig中设置的为写入文件的日志级别，但是在屏幕输出的内容级别需要额外设置</p>
+<p>屏幕输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">root : WARNING This is WARNING</div><div class="line">日志文件输出为：</div><div class="line"></div><div class="line">Tue, 16 Apr 2013 16:57:21 logger3.py [line:21] DEBUG This is DEBUG</div><div class="line">Tue, 16 Apr 2013 16:57:21 logger3.py [line:22] INFO This is INFO</div><div class="line">Tue, 16 Apr 2013 16:57:21 logger3.py [line:23] WARNING This is WARNING</div></pre></td></tr></table></figure></p>
+<h2 id="logging之日志回滚"><a href="#logging之日志回滚" class="headerlink" title="logging之日志回滚"></a>logging之日志回滚</h2><p>略，没看懂。。</p>
+<h2 id="通过logging-config模块配置日志"><a href="#通过logging-config模块配置日志" class="headerlink" title="通过logging.config模块配置日志"></a>通过logging.config模块配置日志</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div></pre></td><td class="code"><pre><div class="line"># --- logconf.ini -----------------------------------------------------------</div><div class="line"># &quot;loggers&quot;模块包含logger配置的所有关键字，这些关键字并非是直接的配置文件模块名</div><div class="line"># 但是，却是Python脚本调用时会使用到的名字。</div><div class="line"># 单独的模块名命名为&quot;logger_xxx&quot; 其中&quot;xxx&quot;部分为&quot;key&quot;</div><div class="line"># 例如 &quot;logger_root&quot;, &quot;logger_log02&quot;</div><div class="line"></div><div class="line">[loggers]</div><div class="line">keys=root,log02,log03,log04,log05,log06,log07</div><div class="line"></div><div class="line"># &quot;handlers&quot; 模块包含所有的 handler 配置</div><div class="line"># keys的使用方式同loggers</div><div class="line"></div><div class="line">[handlers]</div><div class="line">keys=hand01,hand02,hand03,hand04,hand05,hand06,hand07,hand08,hand09</div><div class="line"></div><div class="line"># &quot;formatters&quot; 模块包含所有的 formatter 配置</div><div class="line"># keys的使用方式同loggers</div><div class="line"></div><div class="line">[formatters]</div><div class="line">keys=form01,form02,form03,form04,form05,form06,form07,form08,form09</div><div class="line"></div><div class="line">[logger_root]</div><div class="line">level=NOTSET # DEBUG, INFO, WARN, ERROR, CRITICAL 或 NOTSET</div><div class="line"># NOTSET: 如果 propagate=1, 输出参考 parent, 否则, 全部输出</div><div class="line">handlers=hand01</div><div class="line">qualname=(root) # root比较特殊, root需要加(), 别的不需要</div><div class="line">propagate=1 # 此参数为非root logger使用</div><div class="line">channel=</div><div class="line">parent=</div><div class="line"></div><div class="line">[logger_log02]</div><div class="line">level=DEBUG</div><div class="line">propagate=1</div><div class="line">qualname=log02 # qualname 填写全称</div><div class="line">handlers=hand02 # 使用的 handler 名称</div><div class="line">channel=log02 # channel表示最末端部分名称</div><div class="line">parent=(root) # 父logger为root</div><div class="line"></div><div class="line">[logger_log03]</div><div class="line">level=INFO</div><div class="line">propagate=1 # 如果 propagate=1, 输出参考 parent</div><div class="line">qualname=log02.log03 # 由于其 parent 为 log02, 所以全称为 log02.log03</div><div class="line">handlers=hand03</div><div class="line">channel=log03 # 填写最末名称, log02.log03 最后为 log03</div><div class="line">parent=log02</div><div class="line"></div><div class="line">[logger_log04]</div><div class="line">level=WARN</div><div class="line">propagate=0</div><div class="line">qualname=log02.log03.log04</div><div class="line">handlers=hand04</div><div class="line">channel=log04</div><div class="line">parent=log03</div><div class="line"></div><div class="line">[logger_log05]</div><div class="line">level=ERROR</div><div class="line">propagate=1</div><div class="line">qualname=log02.log03.log04.log05</div><div class="line">handlers=hand05</div><div class="line">channel=log05</div><div class="line">parent=log04</div><div class="line"></div><div class="line">[logger_log06]</div><div class="line">level=CRITICAL</div><div class="line">propagate=1</div><div class="line">qualname=log02.log03.log04.log05.log06</div><div class="line">handlers=hand06</div><div class="line">channel=log06</div><div class="line">parent=log05</div><div class="line"></div><div class="line">[logger_log07]</div><div class="line">level=WARN</div><div class="line">propagate=1</div><div class="line">qualname=log02.log03.log04.log05.log06.log07</div><div class="line">handlers=hand07</div><div class="line">channel=log07</div><div class="line">parent=log06</div><div class="line"></div><div class="line">[handler_hand01]</div><div class="line">class=StreamHandler # 实例发送错误到流(类似文件的对象)</div><div class="line">level=NOTSET # NOTSET 表示 level 参考 parent</div><div class="line">formatter=form01</div><div class="line">args=(sys.stdout,) # args 为传给 handler 构造函数的参数</div><div class="line">stream=sys.stdout</div><div class="line"></div><div class="line">[handler_hand02]</div><div class="line">class=FileHandler # 实例发送错误到磁盘文件</div><div class="line">level=DEBUG</div><div class="line">formatter=form02</div><div class="line">args=(&apos;python.log&apos;, &apos;w&apos;)</div><div class="line">filename=python.log</div><div class="line">mode=w</div><div class="line"></div><div class="line">[handler_hand03]</div><div class="line">class=handlers.SocketHandler # 实例发送日志到TCP/IP socket</div><div class="line">level=INFO</div><div class="line">formatter=form03</div><div class="line">args=(&apos;localhost&apos;, handlers.DEFAULT_TCP_LOGGING_PORT)</div><div class="line">host=localhost</div><div class="line">port=DEFAULT_TCP_LOGGING_PORT</div><div class="line"></div><div class="line">[handler_hand04]</div><div class="line">class=handlers.DatagramHandler # 实例发送错误信息通过UDP协议</div><div class="line">level=WARN</div><div class="line">formatter=form04</div><div class="line">args=(&apos;localhost&apos;, handlers.DEFAULT_UDP_LOGGING_PORT)</div><div class="line">host=localhost</div><div class="line">port=DEFAULT_UDP_LOGGING_PORT</div><div class="line"></div><div class="line">[handler_hand05]</div><div class="line">class=handlers.SysLogHandler # 实例发送日志到UNIX syslog服务，并支持远程syslog服务</div><div class="line">level=ERROR</div><div class="line">formatter=form05</div><div class="line">args=((&apos;localhost&apos;, handlers.SYSLOG_UDP_PORT), handlers.SysLogHandler.LOG_USER)</div><div class="line">host=localhost</div><div class="line">port=SYSLOG_UDP_PORT</div><div class="line">facility=LOG_USER</div><div class="line"></div><div class="line">[handler_hand06]</div><div class="line">class=NTEventLogHandler # 实例发送日志到WindowsNT/2000/XP事件日志</div><div class="line">level=CRITICAL</div><div class="line">formatter=form06</div><div class="line">args=(&apos;Python Application&apos;, &apos;&apos;, &apos;Application&apos;)</div><div class="line">appname=Python Application</div><div class="line">dllname=</div><div class="line">logtype=Application</div><div class="line"></div><div class="line">[handler_hand07]</div><div class="line">class=SMTPHandler # 实例发送错误信息到特定的email地址</div><div class="line">level=WARN</div><div class="line">formatter=form07</div><div class="line">args=(&apos;localhost&apos;, &apos;from@abc&apos;, [&apos;user1@abc&apos;, &apos;user2@xyz&apos;], &apos;Logger Subject&apos;)</div><div class="line">host=localhost</div><div class="line">port=25</div><div class="line">from=from@abc</div><div class="line">to=user1@abc,user2@xyz</div><div class="line">subject=Logger Subject</div><div class="line"></div><div class="line">[handler_hand08]</div><div class="line">class=MemoryHandler # 实例发送日志到内存中的缓冲区，并在达到特定条件时清空</div><div class="line">level=NOTSET</div><div class="line">formatter=form08</div><div class="line">target=</div><div class="line">args=(10, ERROR)</div><div class="line">capacity=10</div><div class="line">flushlevel=ERROR</div><div class="line"></div><div class="line">[handler_hand09]</div><div class="line">class=HTTPHandler # 实例发送错误信息到HTTP服务器，通过GET或POST方法</div><div class="line">level=NOTSET</div><div class="line">formatter=form09</div><div class="line">args=(&apos;localhost:9022&apos;, &apos;/log&apos;, &apos;GET&apos;)</div><div class="line">host=localhost</div><div class="line">port=9022</div><div class="line">url=/log</div><div class="line">method=GET</div><div class="line"></div><div class="line">[handler_hand010]</div><div class="line"># BaseRotatingHandler是所有轮徇日志的基类，不能直接使用。</div><div class="line"># 但是可以使用RotatingFileHandler和TimeRotatingFileHandler。</div><div class="line">class=handlers.RotatingFileHandler # 实例发送信息到磁盘文件，并且限制最大的日志文件大小，并适时轮徇</div><div class="line">level=INFO</div><div class="line">formatter=form02</div><div class="line">args=(&apos;test.log&apos;, &apos;a&apos;, 10*1024*1024, 5)</div><div class="line"></div><div class="line">###############################################################################</div><div class="line">[formatter_form01]</div><div class="line">format=F1 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form02]</div><div class="line">format=F2 %(asctime)s %(pathname)s(%(lineno)d): %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form03]</div><div class="line">format=F3 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form04]</div><div class="line">format=%(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form05]</div><div class="line">format=F5 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form06]</div><div class="line">format=F6 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form07]</div><div class="line">format=F7 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form08]</div><div class="line">format=F8 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line">[formatter_form09]</div><div class="line">format=F9 %(asctime)s %(levelname)s %(message)s</div><div class="line">datefmt=</div><div class="line"></div><div class="line"># --- end of logconf.ini ----------------------------------------------------</div><div class="line">logging在低版本（如 2.3.4）中用法有少许差别</div><div class="line">def initial_logger():</div><div class="line">    import logging</div><div class="line">    LOG_FILENAME = &apos;test.log&apos;</div><div class="line">    logger = logging.getLogger()</div><div class="line">    handler = logging.FileHandler(LOG_FILENAME)</div><div class="line">    formatter = logging.Formatter(&apos;[%(asctime)s] %(filename)s[line:%(lineno)d] [%(levelname)s] %(message)s&apos;, &apos;%Y-%m-%d %H:%M:%S&apos;)</div><div class="line">    handler.setFormatter(formatter)</div><div class="line">    logger.addHandler(handler)</div><div class="line">    logger.setLevel(logging.NOTSET)</div><div class="line">    return logger</div><div class="line"></div><div class="line">def main():</div><div class="line">    logger = initial_logger()</div><div class="line">    logger.debug(&quot;test debug&quot;)</div><div class="line"></div><div class="line">if __name__ == &apos;__main__&apos;:</div><div class="line">    main()</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持书写高质量博客，感谢您的支持！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay_reward.jpg" alt="Alex Wang Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Python/" rel="tag">#Python</a>
+          
+            <a href="/tags/Test/" rel="tag">#Test</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/在IDE中使用-JUnit4-进行单元测试/" rel="next" title="在IDE中使用 JUnit4 进行单元测试">
+                <i class="fa fa-chevron-left"></i> 在IDE中使用 JUnit4 进行单元测试
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  <p>热评文章</p>
+  <div class="ds-top-threads" data-range="weekly" data-num-items="4"></div>
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/10/Python-logging日志模块使用小结/"
+           data-title="Python logging日志模块使用小结" data-url="http://www.wenchao.wang/2016/10/Python-logging日志模块使用小结/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/author.jpg"
+               alt="Alex Wang" />
+          <p class="site-author-name" itemprop="name">Alex Wang</p>
+          <p class="site-description motion-element" itemprop="description">印多为忌 不见食伤 始勤终惰 多学少成</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.wenchao.wang/" title="我的个人域名站" target="_blank">我的个人域名站</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简单的将日志打印到屏幕"><span class="nav-number">1.</span> <span class="nav-text">简单的将日志打印到屏幕</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logging之日志回滚"><span class="nav-number">2.</span> <span class="nav-text">logging之日志回滚</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过logging-config模块配置日志"><span class="nav-number">3.</span> <span class="nav-text">通过logging.config模块配置日志</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alex Wang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"wangwc"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("1hFN1RT1TWl9udv3DzBSLoOO-gzGzoHsz", "KdmVKSRnWv14ngT2VYDNuS08");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

@@ -4,9 +4,9 @@
   <subtitle>Intergation, I believe that practice, not dogma</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://www.wenchao.wang/"/>
+  <link href="http://wenchao.wang/"/>
   <updated>2016-10-18T07:35:46.000Z</updated>
-  <id>http://www.wenchao.wang/</id>
+  <id>http://wenchao.wang/</id>
   
   <author>
     <name>Alex Wang</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>Python logging日志模块使用小结</title>
-    <link href="http://www.wenchao.wang/2016/10/Python-logging%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E5%B0%8F%E7%BB%93/"/>
-    <id>http://www.wenchao.wang/2016/10/Python-logging日志模块使用小结/</id>
+    <link href="http://wenchao.wang/2016/10/Python-logging%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E5%B0%8F%E7%BB%93/"/>
+    <id>http://wenchao.wang/2016/10/Python-logging日志模块使用小结/</id>
     <published>2016-10-18T07:28:21.000Z</published>
     <updated>2016-10-18T07:35:46.000Z</updated>
     
@@ -51,16 +51,16 @@
     </summary>
     
     
-      <category term="Python" scheme="http://www.wenchao.wang/tags/Python/"/>
+      <category term="Python" scheme="http://wenchao.wang/tags/Python/"/>
     
-      <category term="Test" scheme="http://www.wenchao.wang/tags/Test/"/>
+      <category term="Test" scheme="http://wenchao.wang/tags/Test/"/>
     
   </entry>
   
   <entry>
     <title>在IDE中使用 JUnit4 进行单元测试</title>
-    <link href="http://www.wenchao.wang/2016/10/%E5%9C%A8IDE%E4%B8%AD%E4%BD%BF%E7%94%A8-JUnit4-%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
-    <id>http://www.wenchao.wang/2016/10/在IDE中使用-JUnit4-进行单元测试/</id>
+    <link href="http://wenchao.wang/2016/10/%E5%9C%A8IDE%E4%B8%AD%E4%BD%BF%E7%94%A8-JUnit4-%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
+    <id>http://wenchao.wang/2016/10/在IDE中使用-JUnit4-进行单元测试/</id>
     <published>2016-10-16T16:43:39.000Z</published>
     <updated>2016-10-18T07:05:43.000Z</updated>
     
@@ -76,16 +76,16 @@
     </summary>
     
     
-      <category term="JUnit" scheme="http://www.wenchao.wang/tags/JUnit/"/>
+      <category term="JUnit" scheme="http://wenchao.wang/tags/JUnit/"/>
     
-      <category term="Java" scheme="http://www.wenchao.wang/tags/Java/"/>
+      <category term="Java" scheme="http://wenchao.wang/tags/Java/"/>
     
   </entry>
   
   <entry>
     <title>使用 PyUnit 构建 Python单元测试</title>
-    <link href="http://www.wenchao.wang/2016/10/%E4%BD%BF%E7%94%A8-PyUnit-%E6%9E%84%E5%BB%BA-Python%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
-    <id>http://www.wenchao.wang/2016/10/使用-PyUnit-构建-Python单元测试/</id>
+    <link href="http://wenchao.wang/2016/10/%E4%BD%BF%E7%94%A8-PyUnit-%E6%9E%84%E5%BB%BA-Python%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
+    <id>http://wenchao.wang/2016/10/使用-PyUnit-构建-Python单元测试/</id>
     <published>2016-10-16T14:25:16.000Z</published>
     <updated>2016-10-18T07:05:43.000Z</updated>
     
@@ -144,16 +144,16 @@
     </summary>
     
     
-      <category term="python" scheme="http://www.wenchao.wang/tags/python/"/>
+      <category term="python" scheme="http://wenchao.wang/tags/python/"/>
     
-      <category term="test" scheme="http://www.wenchao.wang/tags/test/"/>
+      <category term="test" scheme="http://wenchao.wang/tags/test/"/>
     
   </entry>
   
   <entry>
     <title>漫谈 JDBC 以及与 Spring 之整合</title>
-    <link href="http://www.wenchao.wang/2016/10/%E6%BC%AB%E8%B0%88-JDBC-%E4%BB%A5%E5%8F%8A%E4%B8%8E-Spring-%E4%B9%8B%E6%95%B4%E5%90%88/"/>
-    <id>http://www.wenchao.wang/2016/10/漫谈-JDBC-以及与-Spring-之整合/</id>
+    <link href="http://wenchao.wang/2016/10/%E6%BC%AB%E8%B0%88-JDBC-%E4%BB%A5%E5%8F%8A%E4%B8%8E-Spring-%E4%B9%8B%E6%95%B4%E5%90%88/"/>
+    <id>http://wenchao.wang/2016/10/漫谈-JDBC-以及与-Spring-之整合/</id>
     <published>2016-10-14T14:54:38.000Z</published>
     <updated>2016-10-18T07:05:43.000Z</updated>
     
@@ -208,16 +208,16 @@
     </summary>
     
     
-      <category term="Spring" scheme="http://www.wenchao.wang/tags/Spring/"/>
+      <category term="Spring" scheme="http://wenchao.wang/tags/Spring/"/>
     
-      <category term="JDBC" scheme="http://www.wenchao.wang/tags/JDBC/"/>
+      <category term="JDBC" scheme="http://wenchao.wang/tags/JDBC/"/>
     
   </entry>
   
   <entry>
     <title>Spring 与 MyBatis 的集成详解</title>
-    <link href="http://www.wenchao.wang/2016/10/Spring-%E4%B8%8E-MyBatis-%E7%9A%84%E9%9B%86%E6%88%90%E8%AF%A6%E8%A7%A3/"/>
-    <id>http://www.wenchao.wang/2016/10/Spring-与-MyBatis-的集成详解/</id>
+    <link href="http://wenchao.wang/2016/10/Spring-%E4%B8%8E-MyBatis-%E7%9A%84%E9%9B%86%E6%88%90%E8%AF%A6%E8%A7%A3/"/>
+    <id>http://wenchao.wang/2016/10/Spring-与-MyBatis-的集成详解/</id>
     <published>2016-10-13T17:32:09.000Z</published>
     <updated>2016-10-18T07:05:43.000Z</updated>
     
@@ -282,14 +282,14 @@
     </summary>
     
     
-      <category term="Spring" scheme="http://www.wenchao.wang/tags/Spring/"/>
+      <category term="Spring" scheme="http://wenchao.wang/tags/Spring/"/>
     
   </entry>
   
   <entry>
     <title>简介Ubuntu下Apache服务器的安装</title>
-    <link href="http://www.wenchao.wang/2015/10/%E7%AE%80%E4%BB%8BUbuntu%E4%B8%8BApache%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%AE%89%E8%A3%85/"/>
-    <id>http://www.wenchao.wang/2015/10/简介Ubuntu下Apache服务器的安装/</id>
+    <link href="http://wenchao.wang/2015/10/%E7%AE%80%E4%BB%8BUbuntu%E4%B8%8BApache%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9A%84%E5%AE%89%E8%A3%85/"/>
+    <id>http://wenchao.wang/2015/10/简介Ubuntu下Apache服务器的安装/</id>
     <published>2015-10-16T13:35:17.000Z</published>
     <updated>2016-10-18T07:05:43.000Z</updated>
     
@@ -333,7 +333,7 @@
     </summary>
     
     
-      <category term="Apache" scheme="http://www.wenchao.wang/tags/Apache/"/>
+      <category term="Apache" scheme="http://wenchao.wang/tags/Apache/"/>
     
   </entry>
   

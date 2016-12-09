@@ -87,7 +87,7 @@
     <link href="http://wenchao.wang/2016/10/%E4%BD%BF%E7%94%A8-PyUnit-%E6%9E%84%E5%BB%BA-Python%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/"/>
     <id>http://wenchao.wang/2016/10/使用-PyUnit-构建-Python单元测试/</id>
     <published>2016-10-16T14:25:16.000Z</published>
-    <updated>2016-10-18T07:05:43.000Z</updated>
+    <updated>2016-12-09T09:48:30.000Z</updated>
     
     <content type="html"><![CDATA[<h2 id="概况"><a href="#概况" class="headerlink" title="概况"></a>概况</h2><p>Python 单元测试框架（The Python unit testing framework） ，简称为PyUnit ， 是 Kent Beck 和 Erich Gamma 这两位聪明的家伙所设计的 JUnit  的Python 版本。<br>此文档仅阐述针对Python 的单元测试PyUnit 的设计与使用。<br>自从 Python 2.1  版本后，PyUnit 成为 Python 标准库的一部分。</p>
 <h2 id="系统要求"><a href="#系统要求" class="headerlink" title="系统要求"></a>系统要求</h2><p>PyUnit 可以在Python 1.5.2 及更高版本上运行。</p>
@@ -144,9 +144,9 @@
     </summary>
     
     
-      <category term="python" scheme="http://wenchao.wang/tags/python/"/>
+      <category term="Python" scheme="http://wenchao.wang/tags/Python/"/>
     
-      <category term="test" scheme="http://wenchao.wang/tags/test/"/>
+      <category term="Test" scheme="http://wenchao.wang/tags/Test/"/>
     
   </entry>
   

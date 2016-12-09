@@ -3,6 +3,25 @@
 
 
     
+  <url>
+    <loc>http://wenchao.wang/2016/10/%E4%BD%BF%E7%94%A8-PyUnit-%E6%9E%84%E5%BB%BA-Python%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/</loc>
+    <lastmod>2016-12-09T09:48:30.000Z</lastmod>
+    <data>
+        <display>
+        <title>使用 PyUnit 构建 Python单元测试</title>
+        <pubTime>2016-10-16T14:25:16.000Z</pubTime>
+        
+        <tag>Python</tag>
+         
+        <tag>Test</tag>
+         
+         
+           
+        </display>
+    </data>
+    </url>
+
+    
     
     
     
@@ -53,25 +72,6 @@
         <tag>JUnit</tag>
          
         <tag>Java</tag>
-         
-         
-           
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>http://wenchao.wang/2016/10/%E4%BD%BF%E7%94%A8-PyUnit-%E6%9E%84%E5%BB%BA-Python%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/</loc>
-    <lastmod>2016-10-18T07:05:43.000Z</lastmod>
-    <data>
-        <display>
-        <title>使用 PyUnit 构建 Python单元测试</title>
-        <pubTime>2016-10-16T14:25:16.000Z</pubTime>
-        
-        <tag>python</tag>
-         
-        <tag>test</tag>
          
          
            

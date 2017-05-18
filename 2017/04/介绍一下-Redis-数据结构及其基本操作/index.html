@@ -1,0 +1,1216 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Redis," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Nutslog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.png?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="前言本篇文章介绍一下 Redis 的数据结构，以此作为 Redis 学习和使用的开篇。对于现在的公司们而言，Redis 俨然已经成为了事实上的内存数据库、NoSQL 的标准工具，相比于传统的关系型数据库，Redis 将数据以 键值对存于内存中的处理方式，要比关系型数据库的硬盘读取，树形结构查找效率要高出不少，并且易用性也要好于关系数据库。
+相比较于同类的 memcached， 二者处理类似，效率也">
+<meta property="og:type" content="article">
+<meta property="og:title" content="介绍一下-Redis-数据结构及其基本操作">
+<meta property="og:url" content="http://wenchao.wang/2017/04/介绍一下-Redis-数据结构及其基本操作/index.html">
+<meta property="og:site_name" content="Nutslog">
+<meta property="og:description" content="前言本篇文章介绍一下 Redis 的数据结构，以此作为 Redis 学习和使用的开篇。对于现在的公司们而言，Redis 俨然已经成为了事实上的内存数据库、NoSQL 的标准工具，相比于传统的关系型数据库，Redis 将数据以 键值对存于内存中的处理方式，要比关系型数据库的硬盘读取，树形结构查找效率要高出不少，并且易用性也要好于关系数据库。
+相比较于同类的 memcached， 二者处理类似，效率也">
+<meta property="og:updated_time" content="2017-04-14T08:34:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="介绍一下-Redis-数据结构及其基本操作">
+<meta name="twitter:description" content="前言本篇文章介绍一下 Redis 的数据结构，以此作为 Redis 学习和使用的开篇。对于现在的公司们而言，Redis 俨然已经成为了事实上的内存数据库、NoSQL 的标准工具，相比于传统的关系型数据库，Redis 将数据以 键值对存于内存中的处理方式，要比关系型数据库的硬盘读取，树形结构查找效率要高出不少，并且易用性也要好于关系数据库。
+相比较于同类的 memcached， 二者处理类似，效率也">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '7850296',
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://wenchao.wang/2017/04/介绍一下-Redis-数据结构及其基本操作/"/>
+
+
+  <title> 介绍一下-Redis-数据结构及其基本操作 | Nutslog </title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+<body itemscope itemtype="//schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?853529895bee96b6d4b73302b1450327";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="//schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Nutslog</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Intergation, I believe that practice, not dogma</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="//schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                介绍一下-Redis-数据结构及其基本操作
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-14T15:04:43+08:00" content="2017-04-14">
+              2017-04-14
+            </time>
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/04/介绍一下-Redis-数据结构及其基本操作/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/介绍一下-Redis-数据结构及其基本操作/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/04/介绍一下-Redis-数据结构及其基本操作/" class="leancloud_visitors" data-flag-title="介绍一下-Redis-数据结构及其基本操作">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇文章介绍一下 Redis 的数据结构，以此作为 Redis 学习和使用的开篇。<br>对于现在的公司们而言，Redis 俨然已经成为了事实上的内存数据库、<code>NoSQL</code> 的标准工具，相比于传统的关系型数据库，Redis 将数据以 <code>键值对</code>存于内存中的处理方式，要比关系型数据库的硬盘读取，树形结构查找效率要高出不少，并且易用性也要好于关系数据库。</p>
+<p>相比较于同类的 <code>memcached</code>， 二者处理类似，效率也属同一量级，但 Redis 支持更丰富的数据结构。</p>
+<p>简单介绍下 Redis，下面来详细学习下 Redis 提供的数据结构。</p>
+<h1 id="Redis-的数据结构"><a href="#Redis-的数据结构" class="headerlink" title="Redis 的数据结构"></a>Redis 的数据结构</h1><table>
+<thead>
+<tr>
+<th>结构类型</th>
+<th>结构存储的值</th>
+<th>结构的读写能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STRING</td>
+<td>字符串、<em>整数</em>或<em>浮点数</em></td>
+<td>字符串处理；对整数与浮点数的自增/减操作</td>
+</tr>
+<tr>
+<td>LIST</td>
+<td>列表，每个节点含一个字符串</td>
+<td>支持 POP，PUSH 操作，支持随机访问等链表操作</td>
+</tr>
+<tr>
+<td>HASH</td>
+<td>无序散列</td>
+<td>一般散列操作</td>
+</tr>
+<tr>
+<td>SET</td>
+<td>无序集合，每个字符串仅可存在一个</td>
+<td>增删改查的集合操作，支持集合的交、并、差集计算</td>
+</tr>
+<tr>
+<td>ZSET</td>
+<td>有序集合，字符串元素以分值排序</td>
+<td>增删改查等集合操作，支持 range 方法</td>
+</tr>
+</tbody>
+</table>
+<p>下面来具体看看每种类型可用的处理方法：</p>
+<h2 id="STRING-字符串"><a href="#STRING-字符串" class="headerlink" title="STRING 字符串"></a>STRING 字符串</h2><p>STRING 命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>get &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>获取存储的给定键中的值</td>
+</tr>
+<tr>
+<td>SET</td>
+<td><code>set &lt;redis-key&gt;</code></td>
+<td>设置存储在给定键中的值</td>
+</tr>
+<tr>
+<td>DEL</td>
+<td><code>del &lt;redis-key&gt;</code></td>
+<td>删除存储在给定键中的值</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set hello world</div><div class="line">OK</div><div class="line">127.0.0.1:6379&gt; get hello</div><div class="line">&quot;world&quot;</div><div class="line">127.0.0.1:6379&gt; del hello</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; get hello</div><div class="line">(nil)</div></pre></td></tr></table></figure>
+<h2 id="LIST-列表"><a href="#LIST-列表" class="headerlink" title="LIST 列表"></a>LIST 列表</h2><p>LIST 命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LPUSH/RPUSH</td>
+<td><code>lpush/rpush &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>将数据推入列表<strong>左/右</strong>边</td>
+</tr>
+<tr>
+<td>LPOP/RPOP</td>
+<td><code>lpop/rpop &lt;redis-key&gt;</code></td>
+<td>将数据从<strong>左/右</strong>边弹出，并返回</td>
+</tr>
+<tr>
+<td>LINDEX</td>
+<td><code>lindex &lt;redis-key&gt; &lt;index&gt;</code></td>
+<td>获取指定下标的元素</td>
+</tr>
+<tr>
+<td>LRANGE</td>
+<td><code>lrange &lt;redis-key&gt; &lt;start-index&gt; &lt;end-index&gt;</code></td>
+<td>获取列表给定范围内的数据，使用 0 作为起始，-1 作为结束可以取出所有元素</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; lpush mylist 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; lpush mylist 2</div><div class="line">(integer) 2</div><div class="line">127.0.0.1:6379&gt; rpush mylist 3</div><div class="line">(integer) 3</div><div class="line">127.0.0.1:6379&gt; rpush mylist 4</div><div class="line">(integer) 4</div><div class="line">127.0.0.1:6379&gt; lrange mylist 0 -1</div><div class="line">1) &quot;2&quot;</div><div class="line">2) &quot;1&quot;</div><div class="line">3) &quot;3&quot;</div><div class="line">4) &quot;4&quot;</div><div class="line">127.0.0.1:6379&gt; lpop mylist</div><div class="line">&quot;2&quot;</div><div class="line">127.0.0.1:6379&gt; rpop mylist</div><div class="line">&quot;4&quot;</div><div class="line">127.0.0.1:6379&gt; lrange mylist 0 -1</div><div class="line">1) &quot;1&quot;</div><div class="line">2) &quot;3&quot;</div><div class="line">127.0.0.1:6379&gt; lindex mylist 0</div><div class="line">&quot;1&quot;</div></pre></td></tr></table></figure>
+<p>由以上操作可见，<code>rpush</code> 更接近于我们一般的列表在列尾增加数据的操作。</p>
+<h2 id="HASH-散列"><a href="#HASH-散列" class="headerlink" title="HASH 散列"></a>HASH 散列</h2><p>Redis 的散列，可以存储多个键值对之间的映射。Redis 中的散列结构，可以理解为类似 <code>Java</code> 中的 <code>Map&lt;String, Map&lt;String, Object&gt;&gt;</code> 结构。第一个 <code>String</code> 为 <code>Redis</code> 中的 <code>key</code>，第二个 <code>String</code> 为 <code>Hash</code> 中的 <code>key</code>。</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HSET</td>
+<td><code>hset &lt;redis-key&gt; &lt;hash-key&gt; &lt;value&gt;</code></td>
+<td>在 Redis 中创建 HASH</td>
+</tr>
+<tr>
+<td>HGET</td>
+<td><code>hget &lt;redis-key&gt; &lt;hash-key&gt;</code></td>
+<td>获取指定 key 的 value</td>
+</tr>
+<tr>
+<td>HGETALL</td>
+<td><code>hgetall &lt;redis-key&gt;</code></td>
+<td>获取 Hash 中所有的 key-value</td>
+</tr>
+<tr>
+<td>HDEL</td>
+<td><code>hdel &lt;redis-key&gt;</code></td>
+<td>删除 HASH 中指定 key</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; hset redis-key hash-key1 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hset redis-key hash-key2 2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hset redis-key hash-key3 3</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hgetall redis-key</div><div class="line">1) &quot;hash-key1&quot;</div><div class="line">2) &quot;1&quot;</div><div class="line">3) &quot;hash-key2&quot;</div><div class="line">4) &quot;2&quot;</div><div class="line">5) &quot;hash-key3&quot;</div><div class="line">6) &quot;3&quot;</div><div class="line">127.0.0.1:6379&gt; hget redis-key hash-key1</div><div class="line">&quot;1&quot;</div><div class="line">127.0.0.1:6379&gt; hdel redis-key hash-key1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hdel redis-key hash-key2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hgetall redis-key</div><div class="line">1) &quot;hash-key3&quot;</div><div class="line">2) &quot;3&quot;</div></pre></td></tr></table></figure>
+<h2 id="SET-无序集合"><a href="#SET-无序集合" class="headerlink" title="SET 无序集合"></a>SET 无序集合</h2><p>Redis 中的集合 Set，与 Java 中的 Set 类似，都是基于 HashMap 实现，Set 就是只有键，没有值的 HashMap。</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方法</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SADD</td>
+<td><code>sadd &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>在 set 中添加元素</td>
+</tr>
+<tr>
+<td>SMEMBERS</td>
+<td><code>smembers &lt;redis-key&gt;</code></td>
+<td>返回集合所有元素</td>
+</tr>
+<tr>
+<td>SISMEMBER</td>
+<td><code>sismember &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>检查元素是否存在于集合</td>
+</tr>
+<tr>
+<td>SREM</td>
+<td><code>srem &lt;redis-key&gt;</code></td>
+<td>删除指定元素</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; sadd set-key 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sadd set-key 2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sadd set-key 3</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sismember set-key 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sismember set-key 4</div><div class="line">(integer) 0</div><div class="line">127.0.0.1:6379&gt; smembers set-key</div><div class="line">1) &quot;1&quot;</div><div class="line">2) &quot;2&quot;</div><div class="line">3) &quot;3&quot;</div><div class="line">127.0.0.1:6379&gt; srem set-key 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; srem set-key 2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; smembers set-key</div><div class="line">1) &quot;3&quot;</div></pre></td></tr></table></figure>
+<h2 id="ZSET-有序集合"><a href="#ZSET-有序集合" class="headerlink" title="ZSET 有序集合"></a>ZSET 有序集合</h2><p><code>Zset</code>与<code>Set</code>的区别在于，<code>ZSet</code> 为每个集合中的元素定义了一个<code>分值</code>的概念，这使得<code>ZSet</code> 可以对集合中的元素按照分值进行排序。</p>
+<blockquote>
+<p><code>分值</code>必须为<strong>浮点数</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ZADD</td>
+<td><code>zadd &lt;redis-key&gt; &lt;score&gt; &lt;value&gt;</code></td>
+<td>将指定分值的元素加入集合</td>
+</tr>
+<tr>
+<td>ZRANGE</td>
+<td><code>zrange &lt;redis-key&gt; &lt;start-index&gt; &lt;end-index&gt; [withscores]</code></td>
+<td>根据集合内元素排序，获取多个元素</td>
+</tr>
+<tr>
+<td>ZRANGEBYSCORE</td>
+<td><code>zrangebyscore &lt;redis-key&gt; &lt;start-score&gt; &lt;end-score&gt; [withscores]</code></td>
+<td>获取有序集合指定分值段内的元素</td>
+</tr>
+<tr>
+<td>ZREM</td>
+<td><code>zrem &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>移出集合内元素</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; zadd zset-key 777 member1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zadd zset-key 999 member2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zadd zset-key 333 member3</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;member1&quot;</div><div class="line">3) &quot;member2&quot;</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1 withscores</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;333&quot;</div><div class="line">3) &quot;member1&quot;</div><div class="line">4) &quot;777&quot;</div><div class="line">5) &quot;member2&quot;</div><div class="line">6) &quot;999&quot;</div><div class="line">127.0.0.1:6379&gt; zrangebyscore zset-key 0 500</div><div class="line">1) &quot;member3&quot;</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -2</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;member1&quot;</div><div class="line">127.0.0.1:6379&gt; zrem zset-key member1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;member2&quot;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持书写高质量博客，感谢您的支持！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="/images/alipay_reward.jpg" alt="Alex Wang Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Redis/" rel="tag">#Redis</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/简记《Java-应用架构设计——模块化模式与-OSGi》/" rel="next" title="简记《Java 应用架构设计——模块化模式与 OSGi》">
+                <i class="fa fa-chevron-left"></i> 简记《Java 应用架构设计——模块化模式与 OSGi》
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/读《SQL-反模式》之关系型数据库中的树形结构设计总结/" rel="prev" title="读《SQL 反模式》之关系型数据库中的树形结构设计总结">
+                读《SQL 反模式》之关系型数据库中的树形结构设计总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "1",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      },
+      "slide": {
+        "bdImg": "5",
+        "bdPos": "left",
+        "bdTop": "100"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/04/介绍一下-Redis-数据结构及其基本操作/"
+           data-title="介绍一下-Redis-数据结构及其基本操作" data-url="http://wenchao.wang/2017/04/介绍一下-Redis-数据结构及其基本操作/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="//schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/author.jpg"
+               alt="Alex Wang" />
+          <p class="site-author-name" itemprop="name">Alex Wang</p>
+          <p class="site-description motion-element" itemprop="description">印多为忌 不见食伤 始勤终惰 多学少成</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">12</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://kerwong.github.io/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/u/1965783135" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+          <div class="cc-license motion-element" itemprop="license">
+            <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" target="_blank">
+              <img src="/images/cc-by-nc-sa.svg" alt="Creative Commons" />
+            </a>
+          </div>
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-block">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.wenchao.wang/" title="我的个人域名站(暂停使用至17年4月)" target="_blank">我的个人域名站(暂停使用至17年4月)</a>
+                </li>
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.jianshu.com/users/880976920dd2/" title="我的简书" target="_blank">我的简书</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-的数据结构"><span class="nav-number">2.</span> <span class="nav-text">Redis 的数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#STRING-字符串"><span class="nav-number">2.1.</span> <span class="nav-text">STRING 字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LIST-列表"><span class="nav-number">2.2.</span> <span class="nav-text">LIST 列表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HASH-散列"><span class="nav-number">2.3.</span> <span class="nav-text">HASH 散列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SET-无序集合"><span class="nav-number">2.4.</span> <span class="nav-text">SET 无序集合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ZSET-有序集合"><span class="nav-number">2.5.</span> <span class="nav-text">ZSET 有序集合</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Alex Wang</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"wangwc"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = false;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title >= 0 || index_content >= 0 ){
+                                isMatch = true;
+								if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            } 
+							
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for (i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+    });
+  </script>
+  <script type="text/javascript" src="http://cdn.staticfile.org/mathjax/2.4.0/config/TeX-AMS-MML_HTMLorMML.js"></script>
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("1hFN1RT1TWl9udv3DzBSLoOO-gzGzoHsz", "KdmVKSRnWv14ngT2VYDNuS08");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+  
+
+</body>
+</html>

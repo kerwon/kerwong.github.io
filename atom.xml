@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wenchao.wang/"/>
-  <updated>2016-12-23T08:07:09.000Z</updated>
+  <updated>2017-04-16T16:03:41.000Z</updated>
   <id>http://wenchao.wang/</id>
   
   <author>
@@ -14,6 +14,500 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>读《SQL 反模式》之关系型数据库中的树形结构设计总结</title>
+    <link href="http://wenchao.wang/2017/04/%E8%AF%BB%E3%80%8ASQL-%E5%8F%8D%E6%A8%A1%E5%BC%8F%E3%80%8B%E4%B9%8B%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E7%9A%84%E6%A0%91%E5%BD%A2%E7%BB%93%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%80%BB%E7%BB%93/"/>
+    <id>http://wenchao.wang/2017/04/读《SQL-反模式》之关系型数据库中的树形结构设计总结/</id>
+    <published>2017-04-16T12:57:18.000Z</published>
+    <updated>2017-04-16T16:03:41.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在厂长的多次推荐下，终于开始仔细研读《SQL 反模式》 一书。才翻看一章，就觉得相见恨晚，再次强烈推荐。</p>
+<p>关于本文背景，在开发一些网站时，经常会遇到树形的数据结构，例如组织架构、论坛评论、分类信息等。这样的树形结构在存入关系型数据库时，要么存储多条信息保存一条数据的前后关系，要么以不灵活的方式存储结构关系。在以前的论坛开发中，我就遇到过评论数据无法合理存储的情况，最终是限定评论只能存两级。</p>
+<p>要解决此类问题，需要考虑以下几种情况：</p>
+<ul>
+<li>单个节点下的增删改查子节点</li>
+<li>删除父节点时，树结构的变化，如果准确的删除所有子节点</li>
+<li>通过节点查找以上所有祖先节点</li>
+<li></li>
+</ul>
+<p>总之，在看此书前，都没能好好设计出一个方案解决此问题。感谢厂长推荐，感谢此书。</p>
+<h1 id="五个设计方案"><a href="#五个设计方案" class="headerlink" title="五个设计方案"></a>五个设计方案</h1><p>以下面数据作为方案的典型数据加以讨论：<br><img src="http://nutslog.qiniudn.com/17-4-16/13986620-file_1492350024445_cfe9.png" alt="树形结构数据"></p>
+<p>在书中，共列举了 5 种方案，分别是<strong>邻接表</strong>、<strong>递归查询</strong>、<strong>枚举路径</strong>、<strong>嵌套集</strong>、<strong>闭包集</strong>。</p>
+<h2 id="邻接表"><a href="#邻接表" class="headerlink" title="邻接表"></a>邻接表</h2><p>这是树形结构表设计中最为朴素的设计。</p>
+<table>
+<thead>
+<tr>
+<th>COMMENT_ID</th>
+<th>PARENT_ID</th>
+<th>AUTHOR</th>
+<th>COMMENT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td></td>
+<td>Fran</td>
+<td>这个 Bug 的成因是什么</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1</td>
+<td>Ollie</td>
+<td>我觉得是一个空指针</td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>Fran</td>
+<td>不，我查过了</td>
+</tr>
+<tr>
+<td>4</td>
+<td>1</td>
+<td>Kukla</td>
+<td>我们需要查无效输入</td>
+</tr>
+<tr>
+<td>5</td>
+<td>4</td>
+<td>Ollie</td>
+<td>是的，那是个问题</td>
+</tr>
+<tr>
+<td>6</td>
+<td>4</td>
+<td>Fran</td>
+<td>好，查一下吧</td>
+</tr>
+<tr>
+<td>7</td>
+<td>6</td>
+<td>Kukla</td>
+<td>解决了</td>
+</tr>
+</tbody>
+</table>
+<p>优点：<br>在邻接表结构中，增删一个叶节点是非常简单的，并且改变一个叶节点的位置也十分简单。</p>
+<p>缺点：<br>查找或删除一个非叶节点以及其所有后代，就十分困难，需要使用存储过程的循环了。<br>如果要删除一个子树，难度也与查找一个非叶节点一样。</p>
+<p>由于邻接表这样的特性，使得其所能维持的树的层数十分受限。设想一下一张千万数据量的表中，如果有十多层树结构，就将查询该表十多次，效率是非常低的。<br>而且，对于维护树的完整性，也有所限制，例如要删除一个非叶节点，但不删除其子节点。在删除前必须修改其所有子节点的父节点，然后才能删除该非叶节点，这本身就是一段复杂的 SQL 命令，一旦执行出错，则子节点将找不到父节点，永远游离于树结构之外了。</p>
+<h2 id="递归查询"><a href="#递归查询" class="headerlink" title="递归查询"></a>递归查询</h2><p>递归查询采用的表结构与邻接表结构是一致的，区别在于 SQL 语法的使用。<br>递归查询会用到 <code>with...as</code> 这种 <code>CTE（公共表表达式）</code>的方式，完成递归的查询。<code>with...as</code>的语法并不是所有的数据库版本都支持。</p>
+<p>而对于<code>Oracle</code>数据库，可以用<code>start with...</code>与<code>connent by</code> 语法。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">COMMENT</span></div><div class="line"><span class="keyword">START</span> <span class="keyword">WITH</span> COMMENT_ID = <span class="number">4</span></div><div class="line">CONNENT <span class="keyword">BY</span> PARENT_ID = <span class="keyword">PRIOR</span> COMMENT_ID</div></pre></td></tr></table></figure></p>
+<h2 id="枚举路径"><a href="#枚举路径" class="headerlink" title="枚举路径"></a>枚举路径</h2><h2 id="嵌套集"><a href="#嵌套集" class="headerlink" title="嵌套集"></a>嵌套集</h2><h2 id="闭包集"><a href="#闭包集" class="headerlink" title="闭包集"></a>闭包集</h2><h1 id="方案间比较"><a href="#方案间比较" class="headerlink" title="方案间比较"></a>方案间比较</h1><table>
+<thead>
+<tr>
+<th>方案</th>
+<th>表数目</th>
+<th>查询子</th>
+<th>查询树</th>
+<th>插入</th>
+<th>删除叶</th>
+<th>删除树</th>
+<th>引用完整性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>邻接表</td>
+<td>1</td>
+<td>简单</td>
+<td>困难</td>
+<td>简单</td>
+<td>简单</td>
+<td>困难</td>
+<td>是</td>
+</tr>
+<tr>
+<td>递归查询</td>
+<td>1</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>是</td>
+</tr>
+<tr>
+<td>枚举路径</td>
+<td>1</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>否</td>
+</tr>
+<tr>
+<td>嵌套集</td>
+<td>1</td>
+<td>困难</td>
+<td>简单</td>
+<td>困难</td>
+<td>困难</td>
+<td>简单</td>
+<td>否</td>
+</tr>
+<tr>
+<td>闭包集</td>
+<td>2</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>简单</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;在厂长的多次推荐下，终于开始仔细研读《SQL 反模式》 一书。才翻看一章，就觉得相见恨晚，再次强烈推荐。&lt;/p&gt;
+&lt;p&gt;关于本文背景，在开发
+    
+    </summary>
+    
+    
+      <category term="SQL" scheme="http://wenchao.wang/tags/SQL/"/>
+    
+      <category term="Reading" scheme="http://wenchao.wang/tags/Reading/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>介绍一下-Redis-数据结构及其基本操作</title>
+    <link href="http://wenchao.wang/2017/04/%E4%BB%8B%E7%BB%8D%E4%B8%80%E4%B8%8B-Redis-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8F%8A%E5%85%B6%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/"/>
+    <id>http://wenchao.wang/2017/04/介绍一下-Redis-数据结构及其基本操作/</id>
+    <published>2017-04-14T07:04:43.000Z</published>
+    <updated>2017-04-14T08:34:32.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本篇文章介绍一下 Redis 的数据结构，以此作为 Redis 学习和使用的开篇。<br>对于现在的公司们而言，Redis 俨然已经成为了事实上的内存数据库、<code>NoSQL</code> 的标准工具，相比于传统的关系型数据库，Redis 将数据以 <code>键值对</code>存于内存中的处理方式，要比关系型数据库的硬盘读取，树形结构查找效率要高出不少，并且易用性也要好于关系数据库。</p>
+<p>相比较于同类的 <code>memcached</code>， 二者处理类似，效率也属同一量级，但 Redis 支持更丰富的数据结构。</p>
+<p>简单介绍下 Redis，下面来详细学习下 Redis 提供的数据结构。</p>
+<h1 id="Redis-的数据结构"><a href="#Redis-的数据结构" class="headerlink" title="Redis 的数据结构"></a>Redis 的数据结构</h1><table>
+<thead>
+<tr>
+<th>结构类型</th>
+<th>结构存储的值</th>
+<th>结构的读写能力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STRING</td>
+<td>字符串、<em>整数</em>或<em>浮点数</em></td>
+<td>字符串处理；对整数与浮点数的自增/减操作</td>
+</tr>
+<tr>
+<td>LIST</td>
+<td>列表，每个节点含一个字符串</td>
+<td>支持 POP，PUSH 操作，支持随机访问等链表操作</td>
+</tr>
+<tr>
+<td>HASH</td>
+<td>无序散列</td>
+<td>一般散列操作</td>
+</tr>
+<tr>
+<td>SET</td>
+<td>无序集合，每个字符串仅可存在一个</td>
+<td>增删改查的集合操作，支持集合的交、并、差集计算</td>
+</tr>
+<tr>
+<td>ZSET</td>
+<td>有序集合，字符串元素以分值排序</td>
+<td>增删改查等集合操作，支持 range 方法</td>
+</tr>
+</tbody>
+</table>
+<p>下面来具体看看每种类型可用的处理方法：</p>
+<h2 id="STRING-字符串"><a href="#STRING-字符串" class="headerlink" title="STRING 字符串"></a>STRING 字符串</h2><p>STRING 命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>get &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>获取存储的给定键中的值</td>
+</tr>
+<tr>
+<td>SET</td>
+<td><code>set &lt;redis-key&gt;</code></td>
+<td>设置存储在给定键中的值</td>
+</tr>
+<tr>
+<td>DEL</td>
+<td><code>del &lt;redis-key&gt;</code></td>
+<td>删除存储在给定键中的值</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; set hello world</div><div class="line">OK</div><div class="line">127.0.0.1:6379&gt; get hello</div><div class="line">&quot;world&quot;</div><div class="line">127.0.0.1:6379&gt; del hello</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; get hello</div><div class="line">(nil)</div></pre></td></tr></table></figure>
+<h2 id="LIST-列表"><a href="#LIST-列表" class="headerlink" title="LIST 列表"></a>LIST 列表</h2><p>LIST 命令</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LPUSH/RPUSH</td>
+<td><code>lpush/rpush &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>将数据推入列表<strong>左/右</strong>边</td>
+</tr>
+<tr>
+<td>LPOP/RPOP</td>
+<td><code>lpop/rpop &lt;redis-key&gt;</code></td>
+<td>将数据从<strong>左/右</strong>边弹出，并返回</td>
+</tr>
+<tr>
+<td>LINDEX</td>
+<td><code>lindex &lt;redis-key&gt; &lt;index&gt;</code></td>
+<td>获取指定下标的元素</td>
+</tr>
+<tr>
+<td>LRANGE</td>
+<td><code>lrange &lt;redis-key&gt; &lt;start-index&gt; &lt;end-index&gt;</code></td>
+<td>获取列表给定范围内的数据，使用 0 作为起始，-1 作为结束可以取出所有元素</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; lpush mylist 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; lpush mylist 2</div><div class="line">(integer) 2</div><div class="line">127.0.0.1:6379&gt; rpush mylist 3</div><div class="line">(integer) 3</div><div class="line">127.0.0.1:6379&gt; rpush mylist 4</div><div class="line">(integer) 4</div><div class="line">127.0.0.1:6379&gt; lrange mylist 0 -1</div><div class="line">1) &quot;2&quot;</div><div class="line">2) &quot;1&quot;</div><div class="line">3) &quot;3&quot;</div><div class="line">4) &quot;4&quot;</div><div class="line">127.0.0.1:6379&gt; lpop mylist</div><div class="line">&quot;2&quot;</div><div class="line">127.0.0.1:6379&gt; rpop mylist</div><div class="line">&quot;4&quot;</div><div class="line">127.0.0.1:6379&gt; lrange mylist 0 -1</div><div class="line">1) &quot;1&quot;</div><div class="line">2) &quot;3&quot;</div><div class="line">127.0.0.1:6379&gt; lindex mylist 0</div><div class="line">&quot;1&quot;</div></pre></td></tr></table></figure>
+<p>由以上操作可见，<code>rpush</code> 更接近于我们一般的列表在列尾增加数据的操作。</p>
+<h2 id="HASH-散列"><a href="#HASH-散列" class="headerlink" title="HASH 散列"></a>HASH 散列</h2><p>Redis 的散列，可以存储多个键值对之间的映射。Redis 中的散列结构，可以理解为类似 <code>Java</code> 中的 <code>Map&lt;String, Map&lt;String, Object&gt;&gt;</code> 结构。第一个 <code>String</code> 为 <code>Redis</code> 中的 <code>key</code>，第二个 <code>String</code> 为 <code>Hash</code> 中的 <code>key</code>。</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HSET</td>
+<td><code>hset &lt;redis-key&gt; &lt;hash-key&gt; &lt;value&gt;</code></td>
+<td>在 Redis 中创建 HASH</td>
+</tr>
+<tr>
+<td>HGET</td>
+<td><code>hget &lt;redis-key&gt; &lt;hash-key&gt;</code></td>
+<td>获取指定 key 的 value</td>
+</tr>
+<tr>
+<td>HGETALL</td>
+<td><code>hgetall &lt;redis-key&gt;</code></td>
+<td>获取 Hash 中所有的 key-value</td>
+</tr>
+<tr>
+<td>HDEL</td>
+<td><code>hdel &lt;redis-key&gt;</code></td>
+<td>删除 HASH 中指定 key</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; hset redis-key hash-key1 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hset redis-key hash-key2 2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hset redis-key hash-key3 3</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hgetall redis-key</div><div class="line">1) &quot;hash-key1&quot;</div><div class="line">2) &quot;1&quot;</div><div class="line">3) &quot;hash-key2&quot;</div><div class="line">4) &quot;2&quot;</div><div class="line">5) &quot;hash-key3&quot;</div><div class="line">6) &quot;3&quot;</div><div class="line">127.0.0.1:6379&gt; hget redis-key hash-key1</div><div class="line">&quot;1&quot;</div><div class="line">127.0.0.1:6379&gt; hdel redis-key hash-key1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hdel redis-key hash-key2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; hgetall redis-key</div><div class="line">1) &quot;hash-key3&quot;</div><div class="line">2) &quot;3&quot;</div></pre></td></tr></table></figure>
+<h2 id="SET-无序集合"><a href="#SET-无序集合" class="headerlink" title="SET 无序集合"></a>SET 无序集合</h2><p>Redis 中的集合 Set，与 Java 中的 Set 类似，都是基于 HashMap 实现，Set 就是只有键，没有值的 HashMap。</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方法</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SADD</td>
+<td><code>sadd &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>在 set 中添加元素</td>
+</tr>
+<tr>
+<td>SMEMBERS</td>
+<td><code>smembers &lt;redis-key&gt;</code></td>
+<td>返回集合所有元素</td>
+</tr>
+<tr>
+<td>SISMEMBER</td>
+<td><code>sismember &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>检查元素是否存在于集合</td>
+</tr>
+<tr>
+<td>SREM</td>
+<td><code>srem &lt;redis-key&gt;</code></td>
+<td>删除指定元素</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; sadd set-key 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sadd set-key 2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sadd set-key 3</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sismember set-key 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; sismember set-key 4</div><div class="line">(integer) 0</div><div class="line">127.0.0.1:6379&gt; smembers set-key</div><div class="line">1) &quot;1&quot;</div><div class="line">2) &quot;2&quot;</div><div class="line">3) &quot;3&quot;</div><div class="line">127.0.0.1:6379&gt; srem set-key 1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; srem set-key 2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; smembers set-key</div><div class="line">1) &quot;3&quot;</div></pre></td></tr></table></figure>
+<h2 id="ZSET-有序集合"><a href="#ZSET-有序集合" class="headerlink" title="ZSET 有序集合"></a>ZSET 有序集合</h2><p><code>Zset</code>与<code>Set</code>的区别在于，<code>ZSet</code> 为每个集合中的元素定义了一个<code>分值</code>的概念，这使得<code>ZSet</code> 可以对集合中的元素按照分值进行排序。</p>
+<blockquote>
+<p><code>分值</code>必须为<strong>浮点数</strong></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ZADD</td>
+<td><code>zadd &lt;redis-key&gt; &lt;score&gt; &lt;value&gt;</code></td>
+<td>将指定分值的元素加入集合</td>
+</tr>
+<tr>
+<td>ZRANGE</td>
+<td><code>zrange &lt;redis-key&gt; &lt;start-index&gt; &lt;end-index&gt; [withscores]</code></td>
+<td>根据集合内元素排序，获取多个元素</td>
+</tr>
+<tr>
+<td>ZRANGEBYSCORE</td>
+<td><code>zrangebyscore &lt;redis-key&gt; &lt;start-score&gt; &lt;end-score&gt; [withscores]</code></td>
+<td>获取有序集合指定分值段内的元素</td>
+</tr>
+<tr>
+<td>ZREM</td>
+<td><code>zrem &lt;redis-key&gt; &lt;value&gt;</code></td>
+<td>移出集合内元素</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">127.0.0.1:6379&gt; zadd zset-key 777 member1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zadd zset-key 999 member2</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zadd zset-key 333 member3</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;member1&quot;</div><div class="line">3) &quot;member2&quot;</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1 withscores</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;333&quot;</div><div class="line">3) &quot;member1&quot;</div><div class="line">4) &quot;777&quot;</div><div class="line">5) &quot;member2&quot;</div><div class="line">6) &quot;999&quot;</div><div class="line">127.0.0.1:6379&gt; zrangebyscore zset-key 0 500</div><div class="line">1) &quot;member3&quot;</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -2</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;member1&quot;</div><div class="line">127.0.0.1:6379&gt; zrem zset-key member1</div><div class="line">(integer) 1</div><div class="line">127.0.0.1:6379&gt; zrange zset-key 0 -1</div><div class="line">1) &quot;member3&quot;</div><div class="line">2) &quot;member2&quot;</div></pre></td></tr></table></figure>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;本篇文章介绍一下 Redis 的数据结构，以此作为 Redis 学习和使用的开篇。&lt;br&gt;对于现在的公司们而言，Redis 俨然已经成为了事
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://wenchao.wang/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>简记《Java 应用架构设计——模块化模式与 OSGi》</title>
+    <link href="http://wenchao.wang/2017/01/%E7%AE%80%E8%AE%B0%E3%80%8AJava-%E5%BA%94%E7%94%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E2%80%94%E2%80%94%E6%A8%A1%E5%9D%97%E5%8C%96%E6%A8%A1%E5%BC%8F%E4%B8%8E-OSGi%E3%80%8B/"/>
+    <id>http://wenchao.wang/2017/01/简记《Java-应用架构设计——模块化模式与-OSGi》/</id>
+    <published>2017-01-24T01:39:11.000Z</published>
+    <updated>2017-02-03T09:07:03.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>OSGi 服务平台（OSGi Service Platform）是 Java 平台的动态模块化系统。<br>在 OSGi 术语中，模块成为 bundle，OSGi 提供了框架来管理 bundle，bundle 被打包成普通的 Java JAR 文件，里面包含了清单文件（manifest），清单文件中包含了重要的元数据信息，其描述了 bundle 以及对 OSGi 框架的依赖。</p>
+<p>OSGi 提供以下功能：</p>
+<ul>
+<li>模块化</li>
+<li>版本管理：支持相同软件模块的多个版本部署在同一 JVM 实例中</li>
+<li>热部署：允许运行时对系统进行部署和更新，不必重启应用或 JVM</li>
+<li>封装：允许模块对使用者隐藏细节</li>
+<li>面向服务（SOA）：在同一 JVM 中使用面向服务原则</li>
+<li>依赖管理：明确声明模块之间的依赖</li>
+</ul>
+<h1 id="模块化介绍"><a href="#模块化介绍" class="headerlink" title="模块化介绍"></a>模块化介绍</h1><h2 id="定义模块"><a href="#定义模块" class="headerlink" title="定义模块"></a>定义模块</h2><blockquote>
+<p>软件模块是可部署、可管理的、原生可重用的、可组合的、无状态的软件单元，它为用户提供了简洁的接口</p>
+</blockquote>
+<p><strong>Java 平台中，最适合模块化的单元是 JAR</strong></p>
+<ul>
+<li>可部署：独立的部署单元，能够与其他软件模块共处</li>
+<li>可管理：运行时模块系统中，模块可进行安装、卸载、更新</li>
+<li>可测试：可独立测试</li>
+<li>原生重用：模块是进程内（intraprocess）可重用单元，不是分布式计算技术。以模块化组织部署单元的方式，使得模块可以跨应用重用，但模块总是原生调用的。</li>
+<li>可组合：可与其他模块组合</li>
+<li>无状态</li>
+</ul>
+<p>模块化包含运行时模型和开发模型</p>
+<h1 id="模式介绍"><a href="#模式介绍" class="headerlink" title="模式介绍"></a>模式介绍</h1><p>模块化单元，JAR 文件</p>
+<h1 id="OSGi"><a href="#OSGi" class="headerlink" title="OSGi"></a>OSGi</h1>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;OSGi 服务平台（OSGi Service Platform）是 Java 平台的动态模块化系统。&lt;br&gt;在 OSGi 术语中，模块成为 bundle，OSGi 提供了框架来管理 bundle，bundle 被打包成普通的 Java JAR 文件，里面包含了清单文件（ma
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://wenchao.wang/tags/Java/"/>
+    
+      <category term="OSGi" scheme="http://wenchao.wang/tags/OSGi/"/>
+    
+      <category term="模块化" scheme="http://wenchao.wang/tags/%E6%A8%A1%E5%9D%97%E5%8C%96/"/>
+    
+      <category term="笔记" scheme="http://wenchao.wang/tags/%E7%AC%94%E8%AE%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ES 大数据</title>
+    <link href="http://wenchao.wang/2017/01/ES-%E5%A4%A7%E6%95%B0%E6%8D%AE/"/>
+    <id>http://wenchao.wang/2017/01/ES-大数据/</id>
+    <published>2017-01-06T06:02:20.000Z</published>
+    <updated>2017-01-06T07:02:56.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="基于-ES-的大数据加速器——指标系统"><a href="#基于-ES-的大数据加速器——指标系统" class="headerlink" title="基于 ES 的大数据加速器——指标系统"></a>基于 ES 的大数据加速器——指标系统</h1><h2 id="系统介绍"><a href="#系统介绍" class="headerlink" title="系统介绍"></a>系统介绍</h2><p>多维分析<br>数据量：维度的笛卡尔积<br>空间换时间：存储换计算时间</p>
+<p>指标概念：</p>
+<ul>
+<li>指标对象：客户、股票、理财产品，渠道经理</li>
+<li>指标：标签、属性、维度、度量值</li>
+<li>容器：存储指标</li>
+</ul>
+<p>系统要求</p>
+<ul>
+<li>超级标签系统，标签可以无限扩展，所有标签可联合 filter</li>
+<li>cube，无限制扩展维度和度量值</li>
+<li>毫秒级，多维分析同居，用户体验好，查询快</li>
+<li>水平扩展，分布式，开源</li>
+<li>架构部署简单，维护成本低</li>
+<li>支持 SQL 查询，入门快</li>
+</ul>
+<h3 id="ES-介绍"><a href="#ES-介绍" class="headerlink" title="ES 介绍"></a>ES 介绍</h3><p>开源，原用于搜索引擎，指标系统主要用到索引</p>
+<h2 id="系统核心功能"><a href="#系统核心功能" class="headerlink" title="系统核心功能"></a>系统核心功能</h2><p>数据来源、规划、整理</p>
+<h3 id="系统后台管理"><a href="#系统后台管理" class="headerlink" title="系统后台管理"></a>系统后台管理</h3><p>指标模型管理<br>指标管理<br>维度管理<br>其他辅助设置</p>
+<p>ES 优化</p>
+<h2 id="基于指标系统的应用"><a href="#基于指标系统的应用" class="headerlink" title="基于指标系统的应用"></a>基于指标系统的应用</h2><h3 id="User-Journey"><a href="#User-Journey" class="headerlink" title="User Journey"></a>User Journey</h3><h3 id="精准营销"><a href="#精准营销" class="headerlink" title="精准营销"></a>精准营销</h3><ul>
+<li>名单刷选</li>
+<li>消息体系</li>
+<li>推送闭环</li>
+</ul>
+<h3 id="职能多维度分析模型"><a href="#职能多维度分析模型" class="headerlink" title="职能多维度分析模型"></a>职能多维度分析模型</h3><ul>
+<li>理论</li>
+<li>应用场景</li>
+<li>模型功能</li>
+<li>策略修正</li>
+</ul>
+<h3 id="智能选股"><a href="#智能选股" class="headerlink" title="智能选股"></a>智能选股</h3><ul>
+<li>数据基础</li>
+<li>安全仓位</li>
+</ul>
+<h2 id="未来发展"><a href="#未来发展" class="headerlink" title="未来发展"></a>未来发展</h2><h3 id="投资云"><a href="#投资云" class="headerlink" title="投资云"></a>投资云</h3><p>### </p>
+<p>### </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;基于-ES-的大数据加速器——指标系统&quot;&gt;&lt;a href=&quot;#基于-ES-的大数据加速器——指标系统&quot; class=&quot;headerlink&quot; title=&quot;基于 ES 的大数据加速器——指标系统&quot;&gt;&lt;/a&gt;基于 ES 的大数据加速器——指标系统&lt;/h1&gt;&lt;h2 i
+    
+    </summary>
+    
+    
+      <category term="Elastic Search" scheme="http://wenchao.wang/tags/Elastic-Search/"/>
+    
+      <category term="Big Data" scheme="http://wenchao.wang/tags/Big-Data/"/>
+    
+  </entry>
   
   <entry>
     <title>HTTPS 原理与实现</title>
